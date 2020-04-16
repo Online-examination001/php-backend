@@ -1,28 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\v1\AuthController;
-//use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
-
-
-#Routes for Admin users
-
-
 
 
 
@@ -32,14 +11,30 @@ Route::group([
     'middleware' => ['is_admin', 'auth:api']
 ], function ($router) {
     Route::prefix('/product')->group(function () {
-        Route::middleware('auth:api')->post('/add', 'API\v1\ProductsController@create');
-        Route::middleware('auth:api')->get('', 'API\v1\ProductsController@index');
-        Route::middleware('auth:api')->get('/{id}', 'API\v1\ProductsController@show');
-        Route::middleware('auth:api')->put('/{id}/update', 'API\v1\ProductsController@update');
-        Route::middleware('auth:api')->delete('/{id}/delete', 'API\v1\ProductsController@delete');
+        Route::post('/add', 'API\v1\ProductsController@create');
+        Route::get('', 'API\v1\ProductsController@index');
+        Route::get('/{id}', 'API\v1\ProductsController@show');
+        Route::put('/{id}/update', 'API\v1\ProductsController@update');
+        Route::delete('/{id}/delete', 'API\v1\ProductsController@delete');
     });
+
+    #Routes for Admins Operations on institutions
+    Route::post('', 'API\v1\InstitutionController@index');
+    Route::prefix('/institution')->group(function () {
+        Route::get('/{id}', 'API\v1\InstitutionController@show');
+    });
+
+
 });
 
+
+#Routes for operating in istitutions by institutions managers
+
+Route::prefix('/institution')->group(function () {
+    Route::middleware('auth:api')->post('/register', 'API\v1\InstitutionController@create');
+    Route::middleware('auth:api')->put('/{id}/update', 'API\v1\InstitutionController@update');
+    Route::middleware('auth:api')->get('/{id}', 'API\v1\InstitutionController@show');
+});
 
 
 
@@ -48,8 +43,6 @@ Route::prefix('/product')->group(function () {
     Route::get('', 'API\v1\ProductsController@index');
     Route::get('/{id}', 'API\v1\ProductsController@show');
 });
-
-
 # User  Registration Routes
 Route::prefix('/user')->group(function () {
     Route::post('/register', 'API\v1\AuthController@register');
@@ -63,10 +56,7 @@ Route::prefix('/user')->group(function () {
 
 #Testing
 Route::group([
-
-
     'prefix' => 'auth'
-
 ], function ($router) {
 
     Route::post('login', 'AuthController@login');
