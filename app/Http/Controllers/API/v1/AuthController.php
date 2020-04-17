@@ -30,7 +30,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
             $token = auth('api')->attempt($credentials);
-            return response()->json(compact('user', 'token'), 201);
+            return response()->json(compact('user', 'token'), 200);
 
 
 

@@ -18,15 +18,15 @@ class InstitutionController extends Controller
 
     public function show(Request $request,$id)
     {
-        $institution = Institution::findorfail($id);{
+        $institution = Institution::findOrFail($id);{
             return new InstitutionResource($institution);
     }
 }
 
     public function create(Request $request){
         $user = Auth::user();
-        $institution_qs = Institution::where('user_id' == $user->id);
-        if($institution_qs->exists()){
+        $institution_qs = Institution::findOrFail('user_id' == $user->id);
+        if($institution_qs== null){
             return response()->json(['Message'=>'This account cannot register two unstitutions']);
         }
         $institution = new Institution;
@@ -37,6 +37,7 @@ class InstitutionController extends Controller
         $user = Auth::user();
         $institution->user_id = $user->id;
         $institution->name = $request->name;
+        $institution->subscribed_api_left = 0;
         $institution->abbreviated_name = $request->abbreviated_name;
         $institution->save();
         $message = 'You have succesfully registerd an institution';
@@ -49,13 +50,13 @@ class InstitutionController extends Controller
         $user = Auth::user();
 
         #Check if the institution instance to be updated is for the current user
-        $institution_qs = Institution::where('user_id' == $user->id);
-        if (!$institution_qs->exists()) {
+        $institution_qs = Institution::findOrFail('user_id' == $user->id);
+        if (!$institution_qs== null) {
             return response()->json(['Message'=>'You are not authorized to update this account']);
         }
 
         #Check if the id passed in the url exists in the data base
-        $institution = Institution::findorfail('id' == $id);
+        $institution = Institution::findOrFail('id' == $id);
         $validated = $request->validate([
             'name' => 'required|max:250',
             'abbreviated_name' => 'required|max:500',
@@ -64,6 +65,7 @@ class InstitutionController extends Controller
         $institution->user_id = $user->id;
         $institution->name = $request->name;
         $institution->abbreviated_name = $request->abbreviated_name;
+        $institution->subscribed_api_left = $institution->subscribed_api_left;
         $institution->save();
         $message = 'Succesfully Updated the institution account';
         return response()->json(compact('institution', 'message'), 200);

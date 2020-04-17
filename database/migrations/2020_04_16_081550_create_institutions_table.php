@@ -15,9 +15,10 @@ class CreateInstitutionsTable extends Migration
     {
         Schema::create('institutions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('flull_name');
+            $table->string('full_name');
             $table->string('abbreviated_name');
             $table->unsignedBigInteger('user_id');
+            $table->integer('subscribed_api_left');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
