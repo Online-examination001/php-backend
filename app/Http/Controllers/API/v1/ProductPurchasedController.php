@@ -82,7 +82,9 @@ class ProductPurchasedController extends Controller
         }
         $purchased_to_delete->delete();
         $Institution->subscribed_api_left = 0;
-        
+        $Institution->save();
+        $message = 'Purchase deleted succesfully';
+        return response()->json(compact('message'), 200);
 
 
     }
