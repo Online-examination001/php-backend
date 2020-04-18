@@ -38,8 +38,7 @@ class AuthController extends Controller
         $data->created_at = $user->created_at;
         $data->updated_at = $user->updated_at;
 
-            $token = auth('api')->attempt($credentials);
-            $token = Str::random(80);
+            $token = auth()->setTTL(7200)->attempt($credentials);
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
             return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
@@ -55,8 +54,7 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if ($token = auth('api')->attempt($credentials)) {
-            $token = Str::random(80);
+        if ($token = auth()->setTTL(7200)->attempt($credentials)) {
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
             return response()->json(compact('token', 'bearer', 'expires_in'), 200);
