@@ -80,8 +80,13 @@ class AuthController extends Controller
         return Auth::guard();
     }
 
+    public function me()
+    {
+        return response()->json(auth()->user());
+    }
 
-
-
-
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
 }
