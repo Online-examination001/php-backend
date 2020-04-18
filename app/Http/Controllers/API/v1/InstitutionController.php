@@ -11,17 +11,21 @@ use Illuminate\Support\Facades\Auth;
 
 class InstitutionController extends Controller
 {
-    public function index(Request $request){
+    public function index(){
         $institutions = Institution::all();
         return InstitutionResource::collection($institutions);
     }
 
-    public function show(Request $request,$id)
-    {
-        $institution = Institution::findOrFail($id);{
+    public function show()
+    {   $user = Auth::user();
+        $institution = Institution::findOrFail('user_id' == $user->id);
             return new InstitutionResource($institution);
     }
-}
+    public function asminShow($id)
+    {
+        $institution = Institution::findOrFail('id' == $id);
+        return new InstitutionResource($institution);
+    }
 
     public function create(Request $request){
         $user = Auth::user();

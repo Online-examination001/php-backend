@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductPurchasedController extends Controller
 {
-    public function index(Request $request){
+    public function index(){
         $purchased = ProductPurchased:: all();
         return ProductBoughtResource::collection($purchased);
     }
-    public function show(Request $request, $id){
+    public function show($id){
 
         $purchased = ProductPurchased::findOrFail($id);
         if ($purchased == null){
@@ -88,6 +88,7 @@ class ProductPurchasedController extends Controller
 
 
     }
+
 
 }
 

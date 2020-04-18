@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
-    public function index(Request $request){
+    public function index(){
         $products = Product:: all();
         return ProductResource::collection($products);
     }
-    public function show(Request $request,$id)
+    public function show($id)
     {
         $product = Product::findorfail($id);
 
