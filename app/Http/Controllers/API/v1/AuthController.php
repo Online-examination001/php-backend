@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -23,14 +24,25 @@ class AuthController extends Controller
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
         ]);
+        $password = bcrypt($request->password);
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = $request->password;
+        $user->password = $password;
         $user->save();
         $credentials = request(['email', 'password']);
 
+        $data = new User();
+        $data->id = $user->id;
+        $data->name = $user->name;
+        $data->email = $user->email;
+        $data->created_at = $user->created_at;
+        $data->updated_at = $user->updated_at;
+
             $token = auth('api')->attempt($credentials);
-            return response()->json(compact('user', 'token'), 200);
+            $token = Str::random(80);
+            $bearer = 'bearer';
+            $expires_in = auth('api')->factory()->getTTL() * 60;
+            return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
 
 
 
@@ -43,11 +55,18 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if ($token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'invalid credentials'], 401);
+        if ($token = auth('api')->attempt($credentials)) {
+            $token = Str::random(80);
+            $bearer = 'bearer';
+            $expires_in = auth('api')->factory()->getTTL() * 60;
+            return response()->json(compact('token', 'bearer', 'expires_in'), 200);
         }
 
-        return $this->respondWithToken($token);
+       else{
+           return response()->json([
+               'error'=>'Invalid Credentials'
+           ]);
+       }
     }
 
 
@@ -58,19 +77,13 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
-        ]);
-    }
-
     public function guard()
     {
         return Auth::guard();
     }
+
+
+
+
 
 }
