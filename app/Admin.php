@@ -4,17 +4,13 @@ namespace App;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class Admin  extends Authenticatable implements JWTSubject
 
 {
-
-    protected $table = 'admins';
-
-
 
     public function getJWTIdentifier()
     {
