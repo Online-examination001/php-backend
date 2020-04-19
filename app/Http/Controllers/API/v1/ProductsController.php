@@ -26,10 +26,12 @@ class ProductsController extends Controller
             'title'=>'required|max:250',
             'description' => 'required|max:500',
             'price' => 'required',
+            'quantity' => 'required',
         ]);
         $product->title = $request->title;
         $product->description = $request->description;
         $product->price = $request->price;
+        $product->quantity = $request->quantity;
         $product->save();
         $msg= 'Product added';
         return response()->json(['message'=>$msg]);

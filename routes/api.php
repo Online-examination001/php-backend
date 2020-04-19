@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\API\v1\AuthController;
+use App\Http\Controllers\ProductPurchasedController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -7,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group([
     'prefix' => 'admin',
-    'middleware' => ['is_admin', 'auth:api']
+    'middleware' => []
 ], function ($router) {
     Route::prefix('/products')->group(function () {
         Route::post('/add', 'API\v1\ProductsController@create');
@@ -24,12 +25,6 @@ Route::group([
         Route::get('/{id}', 'API\v1\InstitutionController@adminShow');
         Route::get('', 'API\v1\InstitutionController@index');
 
-        #Route for Viewing purchases
-        Route::get('/purchase', 'API\v1\ProductPurchasedController@index');
-        Route::get('/purchase/{id}', 'API\v1\ProductPurchasedController@show');
-        Route::put('/purchase/{id}/top_up', 'API\v1\ProductPurchasedController@update');
-        Route::put('/purchase/buy', 'API\v1\ProductPurchasedController@create');
-
     });
 
 
@@ -37,10 +32,8 @@ Route::group([
 
     Route::prefix('/purchase')->group(function () {
         #Route for Viewing purchases
-        Route::get('', 'API\v1\ProductPurchasedController@index');
-        Route::get('/{id}', 'API\v1\ProductPurchasedController@show');
-        Route::put('/{id}/update', 'API\v1\ProductPurchasedController@update');
-        Route::put('/buy', 'API\v1\ProductPurchasedController@create');
+        Route::get('', 'API\v1\PurchaseController@index');
+        Route::get('/{id}', 'API\v1\PurchaseController@show');
     });
 
 
@@ -54,14 +47,14 @@ Route::group([
 
 Route::prefix('/purchase')->group(function () {
     #Route for Viewing purchases
-    Route::get('/{id}', 'API\v1\ProductPurchasedController@show');
-    Route::put('/{id}/top_up', 'API\v1\ProductPurchasedController@update');
-    Route::put('/buy', 'API\v1\ProductPurchasedController@create');
+    Route::get('/{id}', 'API\v1\PurchaseController@show');
+    Route::put('/{id}/top_up', 'API\v1\PurchaseController@update');
+    Route::post('/buy', 'API\v1\PurchaseController@create');
 });
 
 
 
-
+Route::post('/buy', 'API\v1\PurchaseController@create');
 
 
 #Routes for operating in istitutions by institutions managers
