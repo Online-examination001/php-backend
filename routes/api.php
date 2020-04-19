@@ -59,7 +59,7 @@ Route::post('/buy', 'API\v1\PurchaseController@create');
 
 #Routes for operating in istitutions by institutions managers
 Route::prefix('/institution')->group(function () {
-    Route::middleware('auth:api')->post('/register', 'API\v1\InstitutionController@create');
+    Route::post('/register', 'API\v1\InstitutionController@create');
     Route::middleware('auth:api')->put('/{id}/update', 'API\v1\InstitutionController@update');
     Route::middleware('auth:api')->get('/detail', 'API\v1\InstitutionController@show');
 });

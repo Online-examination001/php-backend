@@ -18,18 +18,18 @@ class InstitutionController extends Controller
 
     public function show()
     {   $user = Auth::user();
-        $institution = Institution::findOrFail('user_id' == $user->id);
+        $institution = Institution::where('user_id', $user->id);
             return new InstitutionResource($institution);
     }
     public function asminShow($id)
     {
-        $institution = Institution::findOrFail('id' == $id);
+        $institution = Institution::where('id' , $id);
         return new InstitutionResource($institution);
     }
 
     public function create(Request $request){
         $user = Auth::user();
-        $institution_qs = Institution::findOrFail('user_id' == $user->id);
+        $institution_qs = Institution::where('user_id', $user->id);
         if($institution_qs== null){
             return response()->json(['Message'=>'This account cannot register two unstitutions']);
         }

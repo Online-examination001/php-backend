@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\API\v1;
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductBoughtResource;
@@ -34,8 +32,8 @@ class PurchaseController extends Controller
     public function create(Request $request)
     {
         $user = Auth::user();
-        $Institution = Institution::find('user_id' == $user->id);
-        $purchased_qs = ProductPurchased::find('institution_id' == $Institution->id);
+        $Institution = Institution::where('user_id', $user->id);
+        $purchased_qs = ProductPurchased::where('institution_id' , $Institution->id);
         if ($purchased_qs  != null) {
             return response()->json([
                 'Message' => 'You have already subscribed to a package',
@@ -54,9 +52,9 @@ class PurchaseController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        $Institution = Institution::find('id' == $user->id);
-        $purchased_to_update = ProductPurchased::findOrFail('id' == $id);
-        $product = Product::find('id' == $purchased_to_update->product_id);
+        $Institution = Institution::where('id' , $user->id);
+        $purchased_to_update = ProductPurchased::where('id' , $id);
+        $product = Product::where('id' , $purchased_to_update->product_id);
         if ($Institution->id != $purchased_to_update->institution_id) {
             return response()->json([
                 'Message' => 'You are not allowed to update this purchase'
@@ -76,9 +74,9 @@ class PurchaseController extends Controller
     public function delete(Request $request, $id)
     {
         $user = Auth::user();
-        $Institution = Institution::find('id' == $user->id);
-        $purchased_to_delete = ProductPurchased::findOrFail('id' == $id);
-        $product = Product::find('id' == $purchased_to_delete->product_id);
+        $Institution = Institution::where('id' , $user->id);
+        $purchased_to_delete = ProductPurchased::where('id' , $id);
+        $product = Product::where('id' , $purchased_to_delete->product_id);
         if ($Institution->id != $purchased_to_delete->institution_id) {
             return response()->json([
                 'Message' => 'You are not allowed to delete this purchase'
