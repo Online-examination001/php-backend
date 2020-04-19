@@ -31,14 +31,7 @@ class AuthController extends Controller
         $user->save();
         $credentials = request(['email', 'password']);
 
-        $data = new User();
-        $data->id = $user->id;
-        $data->name = $user->name;
-        $data->email = $user->email;
-        $data->created_at = $user->created_at;
-        $data->updated_at = $user->updated_at;
-
-            $token = auth()->setTTL(7200)->attempt($credentials);
+            $token = $this->guard()->setTTL(7200)->attempt($credentials);
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
             return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
@@ -54,7 +47,7 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if ($token = auth()->setTTL(7200)->attempt($credentials)) {
+        if ($token = $this->guard()->setTTL(7200)->attempt($credentials)) {
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
             return response()->json(compact('token', 'bearer', 'expires_in'), 200);
@@ -77,7 +70,7 @@ class AuthController extends Controller
 
     public function guard()
     {
-        return Auth::guard();
+        return Auth::guard('users');
     }
 
     public function me()
