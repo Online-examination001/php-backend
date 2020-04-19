@@ -31,6 +31,13 @@ class AuthController extends Controller
         $user->save();
         $credentials = request(['email', 'password']);
 
+        $data = new User();
+        $data->id = $user->id;
+        $data->name = $user->name;
+        $data->email = $user->email;
+        $data->created_at = $user->created_at;
+        $data->updated_at = $user->updated_at;
+
             $token = $this->guard()->setTTL(7200)->attempt($credentials);
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
@@ -70,7 +77,7 @@ class AuthController extends Controller
 
     public function guard()
     {
-        return Auth::guard('users');
+        return Auth::guard('api');
     }
 
     public function me()

@@ -11,6 +11,11 @@ use Illuminate\Notifications\Notifiable;
 class Admin  extends Authenticatable implements JWTSubject
 
 {
+
+    protected $table = 'admins';
+
+
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -59,5 +64,5 @@ class Admin  extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    protected $table = 'admins';
+
 }

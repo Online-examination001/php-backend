@@ -4,7 +4,6 @@ use App\Http\Controllers\ProductPurchasedController;
 use Illuminate\Support\Facades\Route;
 
 
-
 Route::post('/admin/login', 'API\v1\auth\AdminAuthController@login');
 Route::post('admin/register', 'API\v1\auth\AdminAuthController@register');
 Route::group([
@@ -85,10 +84,10 @@ Route::prefix('/products')->group(function () {
 });
 # User  Registration Routes
 Route::prefix('/auth')->group(function () {
-    Route::post('/register', 'API\v1\auth\AuthController@register');
-    Route::post('/login', 'API\v1\auth\AuthController@login');
-    Route::middleware('auth:api')->post('/logout', 'API\v1\auth\AuthController@logout');
-    Route::post('/me', 'API\v1\auth\AuthController@me');
-    Route::post('refresh', 'API\v1\auth\AuthController@refresh');
+    Route::post('/register', 'API\v1\AuthController@register');
+    Route::post('/login', 'API\v1\AuthController@login');
+    Route::middleware('auth:api')->post('/logout', 'API\v1\AuthController@logout');
+    Route::post('/me', 'API\v1\AuthController@me');
+    Route::post('refresh', 'API\v1\AuthController@refresh');
 });
 

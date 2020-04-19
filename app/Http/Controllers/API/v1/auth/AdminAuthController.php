@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\v1\auth;
 use App\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 
 class AdminAuthController extends Controller
@@ -16,10 +17,10 @@ class AdminAuthController extends Controller
 
     public function register(Request $request)
     {
-        $admin = new Admin();
+        $admin = new Admin;
         $validate = $request->validate([
             'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:admin',
+            'email' => 'required|email|max:255|unique:admins',
             'password' => 'required|min:6|confirmed',
         ]);
         $password = bcrypt($request->password);
@@ -29,11 +30,19 @@ class AdminAuthController extends Controller
         $admin->save();
         $credentials = request(['email', 'password']);
 
+        $data = new Admin();
+        $data->id = $admin->id;
+        $data->name = $admin->name;
+        $data->email = $admin->email;
+        $data->created_at = $admin->created_at;
+        $data->updated_at = $admin->updated_at;
+
         $token = $this->guard()->setTTL(7200)->attempt($credentials);
         $bearer = 'bearer';
         $expires_in = auth('api')->factory()->getTTL() * 60;
         return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
-    }
+ }
+
 
 
 

@@ -49,7 +49,8 @@ return [
         'admin' => [
             'driver' => 'jwt',
             'provider' => 'admins',
-        ]
+            'hash' => false,
+        ],
     ],
 
 
