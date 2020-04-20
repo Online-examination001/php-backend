@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API\v1\auth;
 use App\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -84,4 +83,48 @@ class AdminAuthController extends Controller
     {
         return $this->respondWithToken(auth()->refresh());
     }
+
+
+public function update_account(Request $request){
+    $validate = $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:admins',
+            'password' => 'required|min:6|confirmed',
+    ]);
+
+    $admin = Auth::user();
+    $admin->id = $admin->id;
+    $admin->name = $request->name;
+    $admin->email = $request->email;
+    $admin->password =bcrypt($request->password);
+    #Update credentials
+    $admin->update();
+
+        #Log user out
+        auth()->logout();
+
+
+    #Data data to be returned(excluding password)
+    $data = new Admin();
+    $data->id = $admin->id;
+    $data->name = $admin->name;
+    $data->email = $admin->email;
+    $data->created_at = $admin->created_at;
+    $data->updated_at = $admin->updated_at;
+    $message = "You have been logged out, Please log in again with new credentials";
+    $success = "Your account has been successfully updated";
+    return response()->json(compact('data','success','message'));
+
+
+}
+
+public function destroy(){
+    $admin_acct = Auth::user();
+    $admin_acct->delete();
+    auth()->logout();
+    $success = "Your account has been successfully deleted";
+    return response()->json(compact('success'));
+
+}
+
 }

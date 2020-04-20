@@ -5,14 +5,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-
-
 
 
 
@@ -89,4 +84,48 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(auth()->refresh());
     }
+
+    public function update_account(Request $request)
+    {
+        $validate = $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:admins',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = Auth::user();
+        $user->id = $user->id;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        #Log user out
+        auth()->logout();
+
+        #Update credentials
+        $user->update();
+
+
+        #Data data to be returned(excluding password)
+        $data = new User();
+        $data->id = $user->id;
+        $data->name = $user->name;
+        $data->email = $user->email;
+        $data->created_at = $user->created_at;
+        $data->updated_at = $user->updated_at;
+        $message = "You have been logged out, Please log in again with new credentials";
+        $success = "Your account haas been successfully updated";
+        return response()->json(compact('data', 'success', 'message'));
+    }
+
+    public function destroy()
+    {
+        $user_acct = Auth::user();
+        $user_acct->delete();
+        auth()->logout();
+        $success = "Your account has been successfully deleted";
+        return response()->json(compact('success'));
+
+    }
+
+
 }

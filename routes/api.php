@@ -1,6 +1,4 @@
 <?php
-use App\Http\Controllers\API\v1\AuthController;
-use App\Http\Controllers\ProductPurchasedController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -15,6 +13,8 @@ Route::group([
         Route::middleware('auth:api')->post('/logout', 'API\v1\auth\AdminAuthController@logout');
         Route::post('/me', 'API\v1\auth\AdminAuthController@me');
         Route::post('refresh', 'API\v1\auth\AdminAuthController@refresh');
+        Route::post('/update_account', 'API\v1\AdminAuthController@update');
+        Route::delete('/delete_account', 'API\v1\AdminAuthController@destroy');
     });
 
 
@@ -89,5 +89,7 @@ Route::prefix('/auth')->group(function () {
     Route::middleware('auth:api')->post('/logout', 'API\v1\AuthController@logout');
     Route::post('/me', 'API\v1\AuthController@me');
     Route::post('refresh', 'API\v1\AuthController@refresh');
+    Route::post('/update_account', 'API\v1\AuthController@update');
+    Route::delete('/delete_account', 'API\v1\AuthController@destroy');
 });
 
