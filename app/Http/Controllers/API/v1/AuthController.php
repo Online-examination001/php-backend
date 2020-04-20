@@ -85,7 +85,7 @@ class AuthController extends Controller
         return $this->respondWithToken(auth()->refresh());
     }
 
-    public function update_account(Request $request)
+    public function update(Request $request)
     {
         $validate = $request->validate([
             'name' => 'required|max:255',

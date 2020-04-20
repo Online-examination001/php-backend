@@ -87,9 +87,9 @@ Route::prefix('/auth')->group(function () {
     Route::post('/register', 'API\v1\AuthController@register');
     Route::post('/login', 'API\v1\AuthController@login');
     Route::middleware('auth:api')->post('/logout', 'API\v1\AuthController@logout');
-    Route::post('/me', 'API\v1\AuthController@me');
+    Route::middleware('auth:api')->get('/me', 'API\v1\AuthController@me');
     Route::post('refresh', 'API\v1\AuthController@refresh');
-    Route::post('/update_account', 'API\v1\AuthController@update');
+    Route::middleware('auth:api')->post('/update_account', 'API\v1\AuthController@update');
     Route::delete('/delete_account', 'API\v1\AuthController@destroy');
 });
 
