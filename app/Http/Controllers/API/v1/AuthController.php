@@ -5,20 +5,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-
-
-
-
     public function register(Request $request){
         $user = new User;
-        $validate = $request->validate([
+        $validator = Validator::make($request->all(),[
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
         ]);
+        $erros= $validator->errors();
+        if ($validator->fails()){
+            return response()->json(compact('erros'));
+        }
         $password = bcrypt($request->password);
         $user->name = $request->name;
         $user->email = $request->email;
@@ -33,13 +34,10 @@ class AuthController extends Controller
         $data->created_at = $user->created_at;
         $data->updated_at = $user->updated_at;
 
-            $token = $this->guard()->setTTL(7200)->attempt($credentials);
-            $bearer = 'bearer';
-            $expires_in = auth('api')->factory()->getTTL() * 60;
-            return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
-
-
-
+        $token = $this->guard()->attempt($credentials);
+        $bearer = 'bearer';
+        $expires_in = auth('api')->factory()->getTTL() * 60;
+        return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
 
     }
 
@@ -49,7 +47,7 @@ class AuthController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if ($token = $this->guard()->setTTL(7200)->attempt($credentials)) {
+        if ($token = $this->guard()->attempt($credentials)) {
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
             return response()->json(compact('token', 'bearer', 'expires_in'), 200);
@@ -98,9 +96,6 @@ class AuthController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
-        #Log user out
-        auth()->logout();
-
         #Update credentials
         $user->update();
 
@@ -126,6 +121,4 @@ class AuthController extends Controller
         return response()->json(compact('success'));
 
     }
-
-
 }

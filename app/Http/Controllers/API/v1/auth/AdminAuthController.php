@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API\v1\auth;
 use App\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AdminAuthController extends Controller
 {
@@ -17,7 +19,7 @@ class AdminAuthController extends Controller
 
     public function register(Request $request)
     {
-        $admin = new Admin;
+        $admin = new User();
         $validate = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:admins',
@@ -30,14 +32,25 @@ class AdminAuthController extends Controller
         $admin->save();
         $credentials = request(['email', 'password']);
 
+
         $data = new Admin();
         $data->id = $admin->id;
         $data->name = $admin->name;
         $data->email = $admin->email;
         $data->created_at = $admin->created_at;
         $data->updated_at = $admin->updated_at;
+        try{
 
-        $token = $this->guard()->setTTL(7200)->attempt($credentials);
+            $token = $this->guard()->attempt($credentials);
+
+
+
+        }
+        catch(JWTException $e){
+            return response()->json( ['error'=>'Could not create token'],500);
+        }
+
+
         $bearer = 'bearer';
         $expires_in = auth('api')->factory()->getTTL() * 60;
         return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
@@ -49,12 +62,12 @@ class AdminAuthController extends Controller
     public function login()
     {
         $credentials = request(['email', 'password']);
-        if ($token = $this->guard()->setTTL(7200)->attempt($credentials)) {
 
+        if ($token = auth('admin')->attempt($credentials)) {
             $bearer = 'bearer';
-            $expires_in = auth('api')->factory()->getTTL() * 60;
+            $expires_in = auth('admin')->factory()->getTTL() * 60;
             return response()->json(compact('token', 'bearer', 'expires_in'), 200);
-        } else {
+             } else {
             return response()->json([
                 'error' => 'Invalid Credentials'
             ]);
@@ -99,9 +112,6 @@ public function update_account(Request $request){
     $admin->password =bcrypt($request->password);
     #Update credentials
     $admin->update();
-
-        #Log user out
-        auth()->logout();
 
 
     #Data data to be returned(excluding password)

@@ -54,13 +54,13 @@ class InstitutionController extends Controller
         $user = Auth::user();
 
         #Check if the institution instance to be updated is for the current user
-        $institution_qs = Institution::findOrFail('user_id' == $user->id);
-        if (!$institution_qs== null) {
+        $institution_qs = Institution::where('user_id' , $user->id);
+        if (!$institution_qs == null) {
             return response()->json(['Message'=>'You are not authorized to update this account']);
         }
 
         #Check if the id passed in the url exists in the data base
-        $institution = Institution::findOrFail('id' == $id);
+        $institution = Institution::where('id' , $id);
         $validated = $request->validate([
             'name' => 'required|max:250',
             'abbreviated_name' => 'required|max:500',

@@ -11,7 +11,7 @@ Route::group([
     Route::prefix('/auth')->group(function () {
         Route::post('/register', 'API\v1\auth\AdminAuthController@register');
         Route::middleware('auth:api')->post('/logout', 'API\v1\auth\AdminAuthController@logout');
-        Route::post('/me', 'API\v1\auth\AdminAuthController@me');
+        Route::middleware('auth:api')->post('/me', 'API\v1\auth\AdminAuthController@me');
         Route::post('refresh', 'API\v1\auth\AdminAuthController@refresh');
         Route::post('/update_account', 'API\v1\AdminAuthController@update');
         Route::delete('/delete_account', 'API\v1\AdminAuthController@destroy');
