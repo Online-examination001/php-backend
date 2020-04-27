@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -20,11 +21,15 @@ class AdminAuthController extends Controller
     public function register(Request $request)
     {
         $admin = new User();
-        $validate = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:admins',
+            'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
         ]);
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            return response()->json(compact('erros'));
+        }
         $password = bcrypt($request->password);
         $admin->name = $request->name;
         $admin->email = $request->email;
