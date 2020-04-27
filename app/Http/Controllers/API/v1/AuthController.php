@@ -41,7 +41,7 @@ class AuthController extends Controller
 
     }
 
- 
+
 
     public function login()
     {
@@ -85,12 +85,15 @@ class AuthController extends Controller
 
     public function update(Request $request)
     {
-        $validate = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:admins',
+            'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
         ]);
-
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            return response()->json(compact('erros'));
+        }
         $user = Auth::user();
         $user->id = $user->id;
         $user->name = $request->name;

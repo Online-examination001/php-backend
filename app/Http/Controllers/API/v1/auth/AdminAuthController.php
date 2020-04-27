@@ -104,12 +104,15 @@ class AdminAuthController extends Controller
 
 
 public function update_account(Request $request){
-    $validate = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:admins',
+            'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
-    ]);
-
+        ]);
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            return response()->json(compact('erros'));
+        }
     $admin = Auth::user();
     $admin->id = $admin->id;
     $admin->name = $request->name;

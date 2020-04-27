@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductsController extends Controller
 {
@@ -22,12 +23,16 @@ class ProductsController extends Controller
     public function create(Request $request)
     {
         $product = new Product;
-        $validated =$request->validate([
-            'title'=>'required|max:250',
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:250',
             'description' => 'required|max:500',
             'price' => 'required',
             'quantity' => 'required',
         ]);
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            return response()->json(compact('erros'));
+        }
         $product->title = $request->title;
         $product->description = $request->description;
         $product->price = $request->price;

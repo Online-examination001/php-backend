@@ -8,6 +8,7 @@ use App\Http\Resources\InstitutionResource;
 use App\Institution;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class InstitutionController extends Controller
 {
@@ -21,7 +22,7 @@ class InstitutionController extends Controller
         $institution = Institution::where('user_id', $user->id);
             return new InstitutionResource($institution);
     }
-    public function asminShow($id)
+    public function adminShow($id)
     {
         $institution = Institution::where('id' , $id);
         return new InstitutionResource($institution);
@@ -34,10 +35,14 @@ class InstitutionController extends Controller
             return response()->json(['Message'=>'This account cannot register two unstitutions']);
         }
         $institution = new Institution;
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|max:250',
             'abbreviated_name' => 'required|max:500',
         ]);
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            return response()->json(compact('erros'));
+        }
         $user = Auth::user();
         $institution->user_id = $user->id;
         $institution->name = $request->name;
@@ -61,10 +66,14 @@ class InstitutionController extends Controller
 
         #Check if the id passed in the url exists in the data base
         $institution = Institution::where('id' , $id);
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|max:250',
             'abbreviated_name' => 'required|max:500',
         ]);
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            return response()->json(compact('erros'));
+        }
         $user = Auth::user();
         $institution->user_id = $user->id;
         $institution->name = $request->name;
