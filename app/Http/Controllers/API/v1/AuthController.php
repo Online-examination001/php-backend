@@ -18,7 +18,8 @@ class AuthController extends Controller
         ]);
         $erros= $validator->errors();
         if ($validator->fails()){
-            return response()->json(compact('erros'));
+            $status = 400;
+            return response()->json(compact('erros','status'),400);
         }
         $password = bcrypt($request->password);
         $user->name = $request->name;
@@ -37,7 +38,8 @@ class AuthController extends Controller
         $token = $this->guard()->attempt($credentials);
         $bearer = 'bearer';
         $expires_in = auth('api')->factory()->getTTL() * 60;
-        return response()->json(compact('data', 'token', 'bearer', 'expires_in'), 200);
+        $status = http_response_code(201);
+        return response()->json(compact('data', 'token', 'bearer', 'expires_in','status'), $status);
 
     }
 
@@ -50,13 +52,16 @@ class AuthController extends Controller
         if ($token = $this->guard()->attempt($credentials)) {
             $bearer = 'bearer';
             $expires_in = auth('api')->factory()->getTTL() * 60;
-            return response()->json(compact('token', 'bearer', 'expires_in'), 200);
+            $status = http_response_code(200);
+            return response()->json(compact('token', 'bearer', 'expires_in','status'), $status);
         }
 
        else{
+            $status = http_response_code(401);
            return response()->json([
                'error'=>'Invalid Credentials'
-           ]);
+
+           ],$status);
        }
     }
 
@@ -64,8 +69,8 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        $status = 200;
+        return response()->json(['message' => 'Successfully logged out','status' => $status],$status);
     }
 
     public function guard()
@@ -75,7 +80,8 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(Auth::user());
+        $status = 200;
+        return response()->json(Auth::user(),$status);
     }
 
     public function refresh()
@@ -92,7 +98,8 @@ class AuthController extends Controller
         ]);
         $erros = $validator->errors();
         if ($validator->fails()) {
-            return response()->json(compact('erros'));
+            $status = 400;
+            return response()->json(compact('erros','status'),$status);
         }
         $user = Auth::user();
         $user->id = $user->id;
@@ -112,7 +119,8 @@ class AuthController extends Controller
         $data->updated_at = $user->updated_at;
         $message = "You have been logged out, Please log in again with new credentials";
         $success = "Your account haas been successfully updated";
-        return response()->json(compact('data', 'success', 'message'));
+        $status = 201;
+        return response()->json(compact('data', 'success', 'message'),$status);
     }
 
     public function destroy()
@@ -121,7 +129,8 @@ class AuthController extends Controller
         $user_acct->delete();
         auth()->logout();
         $success = "Your account has been successfully deleted";
-        return response()->json(compact('success'));
+        $status = 200;
+        return response()->json(compact('success','status'),$status);
 
     }
 }

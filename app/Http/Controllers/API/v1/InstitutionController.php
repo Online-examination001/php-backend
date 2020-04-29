@@ -19,20 +19,20 @@ class InstitutionController extends Controller
 
     public function show()
     {   $user = Auth::user();
-        $institution = Institution::where('user_id', $user->id);
+        $institution = Institution::findOrFail('user_id'== $user->id);
             return new InstitutionResource($institution);
     }
     public function adminShow($id)
     {
-        $institution = Institution::where('id' , $id);
+        $institution = Institution::findOrFail('id' == $id);
         return new InstitutionResource($institution);
     }
 
     public function create(Request $request){
         $user = Auth::user();
-        $institution_qs = Institution::where('user_id', $user->id);
+        $institution_qs = Institution::findOrFail('user_id'== $user->id);
         if($institution_qs== null){
-            return response()->json(['Message'=>'This account cannot register two unstitutions']);
+            return response()->json(['error'=>'This account cannot register two unstitutions','status'=>409],409);
         }
         $institution = new Institution;
         $validator = Validator::make($request->all(), [
@@ -41,7 +41,8 @@ class InstitutionController extends Controller
         ]);
         $erros = $validator->errors();
         if ($validator->fails()) {
-            return response()->json(compact('erros'));
+            $status = 400;
+            return response()->json(compact('erros','status'),400);
         }
         $user = Auth::user();
         $institution->user_id = $user->id;
@@ -50,7 +51,8 @@ class InstitutionController extends Controller
         $institution->abbreviated_name = $request->abbreviated_name;
         $institution->save();
         $message = 'You have succesfully registerd an institution';
-        return response()->json(compact('institution', 'message'), 200);
+        $status = 201;
+        return response()->json(compact('institution', 'message','status'), 201);
 
     }
 
@@ -59,20 +61,22 @@ class InstitutionController extends Controller
         $user = Auth::user();
 
         #Check if the institution instance to be updated is for the current user
-        $institution_qs = Institution::where('user_id' , $user->id);
+        $institution_qs = Institution::find('user_id' == $user->id);
         if (!$institution_qs == null) {
-            return response()->json(['Message'=>'You are not authorized to update this account']);
+            $status = 404;
+            return response()->json(['Message'=>'You are not authorized to update this account','status'],404);
         }
 
         #Check if the id passed in the url exists in the data base
-        $institution = Institution::where('id' , $id);
+        $institution = Institution::findOrFail('id' == $id);
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:250',
             'abbreviated_name' => 'required|max:500',
         ]);
         $erros = $validator->errors();
         if ($validator->fails()) {
-            return response()->json(compact('erros'));
+            $status = 400;
+            return response()->json(compact('erros','status'),400);
         }
         $user = Auth::user();
         $institution->user_id = $user->id;
@@ -81,7 +85,8 @@ class InstitutionController extends Controller
         $institution->subscribed_api_left = $institution->subscribed_api_left;
         $institution->save();
         $message = 'Succesfully Updated the institution account';
-        return response()->json(compact('institution', 'message'), 200);
+        $status = 200;
+        return response()->json(compact('institution', 'message','status'), 200);
     }
 }
 

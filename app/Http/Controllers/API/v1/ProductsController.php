@@ -22,7 +22,7 @@ class ProductsController extends Controller
     }
     public function create(Request $request)
     {
-        $product = new Product;
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|max:250',
             'description' => 'required|max:500',
@@ -31,37 +31,47 @@ class ProductsController extends Controller
         ]);
         $erros = $validator->errors();
         if ($validator->fails()) {
-            return response()->json(compact('erros'));
+            $status = 400;
+            return response()->json(compact('erros','status'),$status);
         }
+        $product = new Product;
         $product->title = $request->title;
         $product->description = $request->description;
         $product->price = $request->price;
         $product->quantity = $request->quantity;
         $product->save();
         $msg= 'Product added';
-        return response()->json(['message'=>$msg]);
+        $status = 201;
+        return response()->json(['message'=>$msg,'status' => $status],$status);
     }
     public function update(Request $request,$id)
     {
         $product = Product::findorfail($id);
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'max:250',
             'description' => 'max:500',
         ]);
+        $erros = $validator->errors();
+        if ($validator->fails()) {
+            $status = 400;
+            return response()->json(compact('erros','status'),$status);
+        }
         $product->id = $id;
         $product->title = $request->title;
         $product->description = $request->description;
         $product->price = $request->price;
         $product->update();
         $msg = 'Product updated succesflly';
-        return response()->json(['message' => $msg]);
+        $status = 200;
+        return response()->json(['message' => $msg,'status'=>$status],$status);
     }
     public function delete(Request $request, $id)
     {
         $product = Product::findorfail($id);
         $product->delete();
         $msg = 'Product deleted succesflly';
-        return response()->json(['message' => $msg]);
+        $status = 200;
+        return response()->json(['message' => $msg,'status'=>$status],$status);
 
     }
 }
